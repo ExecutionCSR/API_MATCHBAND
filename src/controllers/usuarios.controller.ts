@@ -53,7 +53,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
                 id: Number(userSearchInfo.id)
             },
             data: userDataInfo
-        })
+        });
     });
     fastify.delete('/users/:id', async (request) => {
         let userData = request.params,
@@ -63,6 +63,6 @@ export async function usersRoutes(fastify: FastifyInstance) {
             where: {
                 id: Number(usernfo.id)
             }
-        })
-    })
-}
+        });
+    });
+};

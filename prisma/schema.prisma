@@ -13,13 +13,119 @@ datasource db {
 }
 
 model usuarios {
-    id              Int       @id @default(autoincrement())
-    nome            String    @db.VarChar(500)
-    email           String    @unique @db.VarChar(200)
-    senha           String    @db.VarChar(8)
-    redeSocialId    String?   @unique
-    celular         String?   @default("(00) 0000-0000")
-    sobremim        String?   @db.VarChar(500)
-    data_nascimento DateTime? @db.Date
-    data_criacao    DateTime  @default(now())
+    id             Int       @id @default(autoincrement())
+    nome           String    @db.VarChar(500)
+    codigoUsuario  String    @db.VarChar(45)
+    email          String    @unique @db.VarChar(200)
+    senha          String    @db.VarChar(8)
+    redeSocialId   String?   @unique @db.VarChar(45)
+    celular        String?   @default("(00) 0000-0000")
+    sobremim       String?   @db.VarChar(500)
+    dataNascimento DateTime? @db.Date
+    dataCriacao    DateTime  @default(now())
+    status         Int
+    dataStatus     DateTime? @db.Date
+}
+
+model usuario_arquivos {
+    id                   Int      @id @default(autoincrement())
+    idUsuario            Int
+    idPostagemComentario Int
+    idChatMensagem       Int
+    idPostagem           Int
+    dataArquivo          DateTime
+    arquivo              Bytes    @db.MediumBlob
+    status               Int?
+}
+
+model usuario_perfil {
+    id        Int @id @default(autoincrement())
+    idUsuario Int
+    idPerfil  Int
+}
+
+model tipo_perfil {
+    id        Int     @id @default(autoincrement())
+    nome      String  @db.VarChar(50)
+    descricao String? @db.VarChar(100)
+}
+
+model usuario_solicitacao_amizade {
+    id                   Int      @id @default(autoincrement())
+    idUsuario            Int
+    idUsuarioSolicitante Int
+    mensagem             String   @db.VarChar(200)
+    dataSolicitacao      DateTime @db.Date
+    status               Int
+    dataStatus           DateTime @db.Date
+}
+
+model postagem {
+    id               Int      @id @default(autoincrement())
+    idUsuario        Int
+    conteudo         String   @db.VarChar(500)
+    likes            Int?     @default(0)
+    compartilhamento Int?     @default(0)
+    ameis            Int?
+    links            String?  @db.VarChar(100)
+    tags             String?  @db.VarChar(100)
+    dataPostagem     DateTime
+    status           Int
+}
+
+model postagem_interacao {
+    id            Int      @id @default(autoincrement())
+    idPostagem    Int
+    idUsuario     Int
+    tipo          Int
+    dataInteracao DateTime
+    status        String   @db.VarChar(45)
+}
+
+model postagem_comentario {
+    id             Int      @id @default(autoincrement())
+    idPostagem     Int
+    idUsuario      Int
+    conteudo       String   @db.VarChar(500)
+    dataComentario DateTime
+    status         Int
+}
+
+model usuario_chat {
+    id            Int      @id @default(autoincrement())
+    idUsuario     Int
+    idUsuarioChat Int
+    dataChat      DateTime
+    status        Int?
+}
+
+model chat_mensagens {
+    id              Int      @id @default(autoincrement())
+    idChat          Int
+    idUsuarioEnvio  Int
+    idUsuarioRecebe Int
+    mensagem        String   @db.VarChar(500)
+    dataEnvio       DateTime
+    dataRecebido    DateTime
+    status          Int
+}
+
+model evento {
+    id               Int      @id @default(autoincrement())
+    idUsuarioCriacao Int
+    nome             String   @db.VarChar(100)
+    descricao        String?  @db.VarChar(100)
+    cep              String?  @db.VarChar(8)
+    numero           Int?
+    complemento      String?  @db.VarChar(100)
+    referencia       String?  @db.VarChar(100)
+    dataEnvio        DateTime
+    quantidadeDias   Int
+}
+
+model evento_agenda {
+    id             Int @id @default(autoincrement())
+    idEvento       Int
+    dia            Int
+    idParticipante Int
 }

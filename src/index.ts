@@ -9,10 +9,12 @@ async function bootstrap() {
     fastify.get('/', () => {
         return "pai online";
     });
+    fastify.all('*',(req)=>{
+        return "nao encontrada";
+    });
 
-    fastify.register(usersRoutes)
-    await fastify.listen({ port: 3001,/*host:'0.0.0.0'*/ });
-}
-
+    fastify.register(usersRoutes);
+    await fastify.listen({ port: 3001});
+};
 
 bootstrap();
