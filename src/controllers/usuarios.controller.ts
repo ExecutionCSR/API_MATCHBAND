@@ -7,10 +7,11 @@ export async function usersRoutes(fastify: FastifyInstance) {
         email: z.string().email(),
         senha: z.string(),
         nome: z.string(),
-        data_nascimento: z.coerce.date().nullable(),
+        dataNascimento: z.coerce.date().nullable(),
         celular: z.string().nullable(),
         sobremim: z.string().nullable(),
         redeSocialId: z.string(),
+        status: z.number(),
     }),
         userSearchSchema = z.object({
             id: z.string().or(z.number()).nullable()
@@ -25,6 +26,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
             });
 
         if (!user) {
+            //user = userInfo
             user = await prisma.usuarios.create({
                 data: userInfo
             });

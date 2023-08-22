@@ -15,7 +15,7 @@ datasource db {
 model usuarios {
     id             Int       @id @default(autoincrement())
     nome           String    @db.VarChar(500)
-    codigoUsuario  String    @db.VarChar(45)
+    codigoUsuario  String?   @db.VarChar(45)
     email          String    @unique @db.VarChar(200)
     senha          String    @db.VarChar(8)
     redeSocialId   String?   @unique @db.VarChar(45)
@@ -24,7 +24,7 @@ model usuarios {
     dataNascimento DateTime? @db.Date
     dataCriacao    DateTime  @default(now())
     status         Int
-    dataStatus     DateTime? @db.Date
+    dataStatus     DateTime  @default(now()) @updatedAt @db.Date
 }
 
 model usuario_arquivos {
