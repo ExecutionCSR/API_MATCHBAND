@@ -17,7 +17,37 @@ export async function usersRoutes(fastify: FastifyInstance) {
             id: z.string().or(z.number()).nullable()
         });
     fastify.post('/users', async (request) => {
-        let userData = request.body,
+        const createuserBody = z.object({
+            access_token: z.string(),
+        })
+
+        const { access_token } = createuserBody.parse(request.body)
+
+        const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        }),
+            userData = await userResponse.json();
+
+        const userInfoShcema = z.object({
+            id: z.string(),
+            email: z.string().email(),
+            name: z.string(),
+            picture: z.string().url()
+        }),
+            userInfo = userInfoShcema.parse(userData);
+
+
+        let user = await prisma.usuarios.findUnique({
+            where: {
+                redeSocialId: userInfo.id
+            }
+        });
+
+        console.log(user);
+        /*let userData = request.body,
             userInfo = userDataSchema.parse(userData),
             user = await prisma.usuarios.findUnique({
                 where: {
@@ -31,7 +61,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
                 data: userInfo
             });
         };
-        return user;
+        return user;*/
     });
     fastify.get('/users/:id', async (request) => {
         let userData = request.params,

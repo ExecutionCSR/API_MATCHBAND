@@ -21,8 +21,10 @@
   },
   "dependencies": {
     "@prisma/client": "^4.14.0",
+    "@types/gapi": "^0.0.44",
     "@types/passport": "^1.0.12",
     "fastify": "^4.17.0",
+    "googleapis": "^126.0.1",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "zod": "^3.21.4"
