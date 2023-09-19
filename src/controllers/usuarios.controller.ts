@@ -1,6 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { prisma } from "../database/prisma";
+import axios from "axios";
+
 
 export async function usersRoutes(fastify: FastifyInstance) {
     let userDataSchema = z.object({
@@ -16,22 +18,58 @@ export async function usersRoutes(fastify: FastifyInstance) {
         userSearchSchema = z.object({
             id: z.string().or(z.number()).nullable()
         });
-    fastify.post('/users', async (request) => {
-        let userData = request.body,
-            userInfo = userDataSchema.parse(userData),
-            user = await prisma.usuarios.findUnique({
-                where: {
-                    email: userInfo.email
-                }
-            });
+    fastify.post('/user/auth', async (request) => {
+        const createuserBody = z.object({
+            access_token: z.string(),
+        });
 
-        if (!user) {
-            //user = userInfo
-            user = await prisma.usuarios.create({
-                data: userInfo
-            });
-        };
-        return user;
+        const { access_token } = createuserBody.parse(request.body)
+
+        const userResponse = await axios('https://www.googleapis.com/oauth2/v2/userinfo', {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        }),
+            userData = userResponse
+
+        const userInfoShcema = z.object({
+            id: z.string(),
+            email: z.string().email(),
+            name: z.string(),
+            picture: z.string().url()
+        }),
+            userInfo = userInfoShcema.parse(userData);
+
+        let usuario = await prisma.usuarios.findUnique({
+            where: {
+                redeSocialId: userInfo.id
+            }
+        });
+
+        return usuario;
+        /*
+        if (!usuario) {
+            usuario = await prisma.usuarios.create({
+                data: {
+                    redeSocialId: userInfo.id,
+                    nome: userInfo.name,
+                    email: userInfo.email,
+                    //avatarUrl: userInfo.picture
+                }
+            })
+        }
+        */
+
+        /*const token = fastify.jwt.sign({
+            name: usuario.nome,
+            //avatarUrl: usuario.avatarUrl
+        }, {
+            sub: usuario.email,
+            expiresIn: "8 days"
+        })
+
+        return { token }*/
     });
     fastify.get('/users/:id', async (request) => {
         let userData = request.params,
@@ -67,4 +105,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
             }
         });
     });
+    /*fastify.get('/user/auth',async (request) => {
+
+    })*/
 };

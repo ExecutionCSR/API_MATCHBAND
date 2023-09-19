@@ -1,12 +1,18 @@
 import Fastify from "fastify";
 import { usersRoutes } from "./controllers/usuarios.controller";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import jwt from "@fastify/jwt";
+import cors from '@fastify/cors';
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env
 async function bootstrap() {
     const fastify = Fastify({
         logger: true
+    });
+    await fastify.register(cors, {
+        origin: true
+    })
+    await fastify.register(jwt,{
+        secret:process.env.CS_CODE
     });
 
     fastify.get('/', () => {
