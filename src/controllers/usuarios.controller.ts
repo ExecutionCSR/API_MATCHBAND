@@ -16,7 +16,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
         status: z.number(),
     }),
         userSearchSchema = z.object({
-            id: z.string().or(z.number()).nullable()
+            id: z.string().or(z.number())
         });
     fastify.post('/user/auth', async (request) => {
         const createuserBody = z.object({
@@ -85,15 +85,17 @@ export async function usersRoutes(fastify: FastifyInstance) {
     fastify.put('/users/:id', async (request) => {
         let userDataSearch = request.params,
             userData = request.body,
-            userDataInfo = userDataSchema.parse(userData),
+            userDataInfo = userDataSchema.partial().parse(userData),
             userSearchInfo = userSearchSchema.parse(userDataSearch);
-
+            
         const user = prisma.usuarios.update({
             where: {
                 id: Number(userSearchInfo.id)
             },
             data: userDataInfo
         });
+
+        return user;
     });
     fastify.delete('/users/:id', async (request) => {
         let userData = request.params,
