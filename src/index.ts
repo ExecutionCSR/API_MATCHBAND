@@ -4,28 +4,27 @@ import jwt from "@fastify/jwt";
 import cors from '@fastify/cors';
 import { postRoutes } from "./controllers/posts.controller";
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CS_CODE } = process.env
-async function bootstrap() {
-    const fastify = Fastify({
-        logger: true
-    });
-    await fastify.register(cors, {
-        origin: true
-    })
-    await fastify.register(jwt, {
-        secret: CS_CODE
-    });
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CS_CODE, PORT } = process.env
 
-    fastify.get('/', () => {
-        return "pai online";
-    });
-    /*fastify.all('*', () => {
-        return "nao encontrada";
-    });*/
+const fastify = Fastify({
+    logger: true
+});
+fastify.register(cors, {
+    origin: true
+})
+fastify.register(jwt, {
+    secret: CS_CODE
+});
 
-    fastify.register(usersRoutes);
-    fastify.register(postRoutes);
-    await fastify.listen({ port: 3001 });
-};
+fastify.get('/', () => {
+    return "pai online";
+});
+/*fastify.all('*', () => {
+    return "nao encontrada";
+});*/
 
-bootstrap();
+fastify.register(usersRoutes);
+fastify.register(postRoutes);
+fastify.listen({ host: "0.0.0.0", port: PORT || 3001 }).then(() => {
+    console.log('https port: ' + PORT)
+})
