@@ -5,8 +5,8 @@
       "es6"
     ],
     "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "resolveJsonModule": true,
     "allowJs": true,
     "esModuleInterop": true,
