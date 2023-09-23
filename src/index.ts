@@ -26,5 +26,5 @@ fastify.get('/', () => {
 fastify.register(usersRoutes);
 fastify.register(postRoutes);
 fastify.listen({ host: "0.0.0.0", port: PORT || 3001 }).then(() => {
-    console.log('https port: ' + PORT)
+    console.log('https port:')
 })

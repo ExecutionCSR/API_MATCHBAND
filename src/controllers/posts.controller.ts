@@ -37,7 +37,7 @@ export async function postRoutes(fastify: FastifyInstance) {
         const post = await prisma.postagem.create({ data: postData });
         return post;
     });
-    fastify.post('/posts/timeline', async (request) => {
+    fastify.get('/posts/timeline', async (request) => {
         const timeline = await prisma.postagem.findMany({
             where: {
                 status: 1
