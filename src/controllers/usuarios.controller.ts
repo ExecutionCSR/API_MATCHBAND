@@ -87,7 +87,7 @@ export async function usersRoutes(fastify: FastifyInstance) {
             userData = request.body,
             userDataInfo = userDataSchema.partial().parse(userData),
             userSearchInfo = userSearchSchema.parse(userDataSearch);
-            
+
         const user = prisma.usuarios.update({
             where: {
                 id: Number(userSearchInfo.id)
@@ -107,7 +107,12 @@ export async function usersRoutes(fastify: FastifyInstance) {
             }
         });
     });
-    /*fastify.get('/user/auth',async (request) => {
+    fastify.post('/users', async (request) => {
+        let userBody = request.body,
+            userData = userDataSchema.parse(userBody);
 
-    })*/
+        const user = await prisma.usuarios.create({data: userData});
+
+        return user;
+    });
 };

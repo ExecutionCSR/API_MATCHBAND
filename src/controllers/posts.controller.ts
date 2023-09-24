@@ -41,6 +41,13 @@ export async function postRoutes(fastify: FastifyInstance) {
         const timeline = await prisma.postagem.findMany({
             where: {
                 status: 1
+            },
+            include: {
+                usuario: {
+                    select:{
+                        nome:true
+                    }
+                }
             }
         })
         return timeline;

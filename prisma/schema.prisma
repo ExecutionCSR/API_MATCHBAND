@@ -26,6 +26,19 @@ model usuarios {
     dataCriacao    DateTime  @default(now())
     status         Int
     dataStatus     DateTime  @default(now()) @updatedAt //@db.Date
+
+    postagem                    postagem[]
+    postagem_interacao          postagem_interacao[]
+    usuario_arquivos            usuario_arquivos[]
+    usuario_solicitacao_amizade usuario_solicitacao_amizade[]
+    usuario_perfil              usuario_perfil[]
+    postagem_comentario         postagem_comentario[]
+    usuario_chat                usuario_chat[]                @relation("usuario_chat")
+    usuario_chat_conversa       usuario_chat[]                @relation("usuario_conversa")
+    chat_mensagens              chat_mensagens[]              @relation("usario_envia")
+    chat_mensagens_recebe       chat_mensagens[]              @relation("usario_recebe")
+    evento                      evento[]
+    evento_agenda               evento_agenda[]
 }
 
 model usuario_arquivos {
@@ -37,18 +50,35 @@ model usuario_arquivos {
     dataArquivo          DateTime
     arquivo              Bytes    @db.MediumBlob
     status               Int?
+
+    usuario    usuarios            @relation(fields: [idUsuario], references: [id])
+    postagem   postagem            @relation(fields: [idPostagem], references: [id])
+    comentario postagem_comentario @relation(fields: [idPostagemComentario], references: [idPostagem])
+    chat       chat_mensagens      @relation(fields: [idChatMensagem], references: [idChat])
+
+    @@index([idPostagemComentario])
+    @@index([idChatMensagem])
+    @@index([idPostagem])
+    @@index([idUsuario])
 }
 
 model usuario_perfil {
     id        Int @id @default(autoincrement())
     idUsuario Int
     idPerfil  Int
+
+    usuario usuarios    @relation(fields: [idUsuario], references: [id])
+    perfil  tipo_perfil @relation(fields: [idPerfil], references: [id])
+
+    @@index([idPerfil])
+    @@index([idUsuario])
 }
 
 model tipo_perfil {
-    id        Int     @id @default(autoincrement())
-    nome      String  @db.VarChar(50)
-    descricao String? @db.VarChar(100)
+    id             Int              @id @default(autoincrement())
+    nome           String           @db.VarChar(50)
+    descricao      String?          @db.VarChar(100)
+    usuario_perfil usuario_perfil[]
 }
 
 model usuario_solicitacao_amizade {
@@ -59,19 +89,29 @@ model usuario_solicitacao_amizade {
     dataSolicitacao      DateTime @db.Date
     status               Int
     dataStatus           DateTime @db.Date
+
+    usuarios usuarios @relation(fields: [idUsuario], references: [id])
+
+    @@index([idUsuario])
 }
 
 model postagem {
-    id               Int      @id @default(autoincrement())
-    idUsuario        Int
-    conteudo         String   @db.VarChar(500)
-    likes            Int?     @default(0)
-    compartilhamento Int?     @default(0)
-    ameis            Int?
-    links            String?  @db.VarChar(100)
-    tags             String?  @db.VarChar(100)
-    dataPostagem     DateTime
-    status           Int
+    id                  Int                  @id @default(autoincrement())
+    idUsuario           Int
+    conteudo            String               @db.VarChar(500)
+    likes               Int?                 @default(0)
+    compartilhamento    Int?                 @default(0)
+    ameis               Int?
+    links               String?              @db.VarChar(100)
+    tags                String?              @db.VarChar(100)
+    dataPostagem        DateTime
+    status              Int
+    usuario             usuarios             @relation(fields: [idUsuario], references: [id])
+    postagem_interacao  postagem_interacao[]
+    usuario_arquivos    usuario_arquivos[]
+    postagem_comentario postagem_comentario?
+
+    @@index([idUsuario])
 }
 
 model postagem_interacao {
@@ -81,34 +121,62 @@ model postagem_interacao {
     tipo          Int
     dataInteracao DateTime
     status        String   @db.VarChar(45)
+
+    postagem postagem @relation(fields: [idPostagem], references: [id])
+    usuarios usuarios @relation(fields: [idUsuario], references: [id])
+
+    @@index([idPostagem])
+    @@index([idUsuario])
 }
 
 model postagem_comentario {
-    id             Int      @id @default(autoincrement())
-    idPostagem     Int
-    idUsuario      Int
-    conteudo       String   @db.VarChar(500)
-    dataComentario DateTime
-    status         Int
+    id               Int                @id @default(autoincrement())
+    idPostagem       Int                @unique
+    idUsuario        Int
+    conteudo         String             @db.VarChar(500)
+    dataComentario   DateTime
+    status           Int
+    usuario_arquivos usuario_arquivos[]
+
+    postagem postagem @relation(fields: [idPostagem], references: [id])
+    usuario  usuarios @relation(fields: [idUsuario], references: [id])
+
+    @@index([idUsuario])
 }
 
 model usuario_chat {
-    id            Int      @id @default(autoincrement())
-    idUsuario     Int
-    idUsuarioChat Int
-    dataChat      DateTime
-    status        Int?
+    id             Int              @id @default(autoincrement())
+    idUsuario      Int
+    idUsuarioChat  Int
+    dataChat       DateTime
+    status         Int?
+    chat_mensagens chat_mensagens[]
+
+    usuario          usuarios @relation("usuario_chat", fields: [idUsuario], references: [id])
+    usuario_conversa usuarios @relation("usuario_conversa", fields: [idUsuarioChat], references: [id])
+
+    @@index([idUsuario])
+    @@index([idUsuarioChat])
 }
 
 model chat_mensagens {
-    id              Int      @id @default(autoincrement())
-    idChat          Int
-    idUsuarioEnvio  Int
-    idUsuarioRecebe Int
-    mensagem        String   @db.VarChar(500)
-    dataEnvio       DateTime
-    dataRecebido    DateTime
-    status          Int
+    id               Int                @id @default(autoincrement())
+    idChat           Int                @unique
+    idUsuarioEnvio   Int
+    idUsuarioRecebe  Int
+    mensagem         String             @db.VarChar(500)
+    dataEnvio        DateTime
+    dataRecebido     DateTime
+    status           Int
+    usuario_arquivos usuario_arquivos[]
+
+    chat           usuario_chat @relation(fields: [idChat], references: [id])
+    usuario_envia  usuarios     @relation("usario_envia", fields: [idUsuarioEnvio], references: [id])
+    usuario_recebe usuarios     @relation("usario_recebe", fields: [idUsuarioRecebe], references: [id])
+
+    @@index([idChat])
+    @@index([idUsuarioEnvio])
+    @@index([idUsuarioRecebe])
 }
 
 model evento {
@@ -122,11 +190,21 @@ model evento {
     referencia       String?  @db.VarChar(100)
     dataEnvio        DateTime
     quantidadeDias   Int
+
+    usuario       usuarios        @relation(fields: [idUsuarioCriacao], references: [id])
+    evento_agenda evento_agenda[]
+
+    @@index([idUsuarioCriacao])
 }
 
 model evento_agenda {
-    id             Int @id @default(autoincrement())
+    id             Int      @id @default(autoincrement())
     idEvento       Int
     dia            Int
     idParticipante Int
+    evento         evento   @relation(fields: [idEvento], references: [id])
+    participante   usuarios @relation(fields: [idParticipante], references: [id])
+
+    @@index([idEvento])
+    @@index([idParticipante])
 }
